@@ -28,6 +28,10 @@
 .field select{cursor:pointer;appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--grey-8a) 50%),linear-gradient(135deg,var(--grey-8a) 50%,transparent 50%);background-position:calc(100% - 10px) 1.35rem,calc(100% - 5px) 1.35rem;background-size:5px 5px;background-repeat:no-repeat;}
 .field select option{background:var(--ink-0e);color:var(--white);}
 .field textarea{resize:vertical;min-height:110px;line-height:1.6;}
+/* the native picker draws itself from this, and the panel is white */
+.field input[type="date"]{color-scheme:light;cursor:pointer;}
+.field input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.55;}
+.field input[type="date"]:hover::-webkit-calendar-picker-indicator{opacity:1;}
 .field input::placeholder,.field textarea::placeholder{color:var(--grey-4a);}
 .field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--accent);background:rgba(255,255,255,.045);}
 .field__err{font-size:var(--fs-micro);letter-spacing:.14em;text-transform:uppercase;color:var(--grey-c7);min-height:1.15em;opacity:0;transform:translate3d(0,-4px,0);transition:opacity 380ms var(--e-out-expo),transform 380ms var(--e-out-expo);}

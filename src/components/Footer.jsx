@@ -23,7 +23,7 @@ export default function Footer() {
             <p className="footer__blurb">{t.footer.blurb}</p>
 
             <div className="footer__contact">
-              <a href="mailto:studio@mightystudio.com">studio@mightystudio.com</a>
+              <a href="mailto:mightystudio@gmail.com">mightystudio@gmail.com</a>
               <a href="https://wa.me/355692921229" target="_blank" rel="noopener noreferrer">
                 +355 69 292 1229
               </a>

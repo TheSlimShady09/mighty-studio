@@ -184,6 +184,9 @@ export function useParticleCamera(canvasRef, hostRef, api) {
 
     function render() {
       if (!buf32) return;
+      // gone, and nothing left on screen to wipe: the scroll listener still
+      // fires all the way down the page, and this is what makes that free
+      if (progress >= 1 && !dirty) return;
       clearDirty();
 
       const pp = progress <= 0 ? 0 : progress >= SPAN ? 1 : progress / SPAN;

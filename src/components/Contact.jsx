@@ -7,7 +7,7 @@ import Reveal, { Lines } from './Reveal';
 /** Enquiries are handed to the studio's WhatsApp, prefilled. */
 const WHATSAPP = '355692921229';
 
-const EMPTY = { name: '', email: '', type: '', budget: '', message: '' };
+const EMPTY = { name: '', email: '', type: '', date: '', place: '', budget: '', message: '' };
 
 function Field({ id, name, label, error, focused, onFocus, onBlur, children }) {
   return (
@@ -32,6 +32,9 @@ export default function Contact() {
     name: v => (v.trim().length >= 2 ? '' : t.contact.errName),
     email: v => (/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()) ? '' : t.contact.errEmail),
     type: v => (v ? '' : t.contact.errType),
+    // a booking is a date before it is anything else
+    date: v => (v ? '' : t.contact.errDate),
+    place: () => '',
     budget: () => '',
     message: v => (v.trim().length >= 12 ? '' : t.contact.errMessage)
   };
@@ -52,17 +55,30 @@ export default function Contact() {
     setErrors(prev => ({ ...prev, [name]: validate(name, value) }));
   };
 
-  /** Everything the studio needs, laid out as a readable message. */
+  /**
+   * The booking, written out ready to send. It reaches the studio's
+   * WhatsApp as one legible block: headed so it is recognisable in a busy
+   * inbox, and in whichever language the visitor was reading the site in.
+   * `*…*` and `_…_` are WhatsApp's own emphasis.
+   */
   const buildMessage = () => {
     const type = PROJECT_TYPES.find(o => o.value === values.type);
     const budget = BUDGETS.find(o => o.value === values.budget);
+    // an <input type="date"> hands back YYYY-MM-DD, which nobody reads
+    const day = values.date ? values.date.split('-').reverse().join('/') : '—';
+
     const lines = [
-      `${t.contact.name}: ${values.name}`,
-      `${t.contact.email}: ${values.email}`,
-      `${t.contact.project}: ${type ? pick(type) : '—'}`
+      `*${t.contact.bookingTitle}*`,
+      '',
+      `${t.contact.name}: ${values.name.trim()}`,
+      `${t.contact.email}: ${values.email.trim()}`,
+      `${t.contact.project}: ${type ? pick(type) : '—'}`,
+      `${t.contact.date}: ${day}`
     ];
+    if (values.place.trim()) lines.push(`${t.contact.place}: ${values.place.trim()}`);
     if (budget) lines.push(`${t.contact.budget}: ${pick(budget)}`);
-    lines.push('', values.message.trim());
+    lines.push('', `*${t.contact.bookingDetails}*`, values.message.trim());
+    lines.push('', `_${t.contact.bookingFrom}_`);
     return lines.join('\n');
   };
 
@@ -127,7 +143,7 @@ export default function Contact() {
               {t.contact.body}
             </Reveal>
             <Reveal className="contact__links" delay={220}>
-              <a href="mailto:studio@mightystudio.com">studio@mightystudio.com</a>
+              <a href="mailto:mightystudio@gmail.com">mightystudio@gmail.com</a>
               <a href="https://wa.me/355692921229" target="_blank" rel="noopener noreferrer">
                 +355 69 292 1229
               </a>
@@ -195,6 +211,30 @@ export default function Contact() {
                         </option>
                       ))}
                     </select>
+                  )}
+                </Field>
+              </div>
+
+              <div className="form__row">
+                <Field id="f-date" label={t.contact.date} {...fieldProps('date')}>
+                  {p => (
+                    <input
+                      {...p}
+                      type="date"
+                      value={values.date}
+                      onChange={handleChange}
+                    />
+                  )}
+                </Field>
+                <Field id="f-place" label={t.contact.place} {...fieldProps('place')}>
+                  {p => (
+                    <input
+                      {...p}
+                      type="text"
+                      placeholder={t.contact.placePlaceholder}
+                      value={values.place}
+                      onChange={handleChange}
+                    />
                   )}
                 </Field>
               </div>

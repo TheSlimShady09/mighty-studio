@@ -38,8 +38,16 @@ export function useScrollProgress(ref, apply, { range = 'through', ease = 0.16 }
       state.target = clamp(p, 0, 1);
     });
 
+    // The lerp never lands on its target by itself, so it is snapped once it
+    // is close enough and the same value is never applied twice. Without this
+    // the hero keeps rewriting identical transforms for the whole length of
+    // the page, long after it has left the screen.
+    let applied = -1;
     const tick = () => {
       state.current = lerp(state.current, state.target, ease);
+      if (Math.abs(state.current - state.target) < 0.0002) state.current = state.target;
+      if (state.current === applied) return;
+      applied = state.current;
       applyRef.current(state.current, el);
     };
 
@@ -76,10 +84,20 @@ export function useScrollVelocity() {
       lastY = y;
     });
 
+    // `--vel` is an inherited custom property on the root, so every write
+    // invalidates style for the entire document. Writing one per frame for
+    // the life of the page cost more main-thread time than everything else
+    // on it put together; it is now written only when the value it would
+    // publish has actually changed, which means never while the page is
+    // still.
+    let published = null;
     const tick = () => {
       smoothed = lerp(smoothed, velocity, 0.1);
       velocity = lerp(velocity, 0, 0.08);
-      root.style.setProperty('--vel', smoothed.toFixed(4));
+      const v = smoothed.toFixed(3);
+      if (v === published) return;
+      published = v;
+      root.style.setProperty('--vel', v);
     };
 
     window.addEventListener('scroll', measure, { passive: true });

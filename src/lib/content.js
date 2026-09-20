@@ -35,9 +35,9 @@ export const UI = {
       phraseScript: 'forever',
       wordmark: 'Mighty Studio',
       tagline: 'Photography and Film',
-      side: 'Tirana · Albania',
+      side: 'Durrës · Albania',
       disciplines: ['Weddings', 'Proposals', 'Events', 'Concerts'],
-      since: 'Est. Tirana'
+      since: 'Est. Durrës'
     },
     about: {
       eyebrow: 'The Studio',
@@ -73,13 +73,17 @@ export const UI = {
       eyebrow: 'Contact',
       title: ['Begin a', 'commission.'],
       body: 'Tell us the date, the venue and what matters most to you. Every enquiry gets a reply from the studio within one working day.',
-      address: 'Tirana, Albania. Studio visits by appointment.',
+      address: 'Durrës, Albania. Studio visits by appointment.',
       name: 'Name',
       namePlaceholder: 'Your name',
       email: 'Email',
       emailPlaceholder: 'you@example.com',
       project: 'Service',
       projectPlaceholder: 'Select a service',
+      date: 'Date',
+      datePlaceholder: 'Day of the event',
+      place: 'Place',
+      placePlaceholder: 'Venue, town',
       budget: 'Budget',
       budgetPlaceholder: 'Optional',
       brief: 'Brief',
@@ -94,10 +98,14 @@ export const UI = {
       errName: 'Tell us your name',
       errEmail: 'A valid email, please',
       errType: 'Pick a service',
-      errMessage: 'A line or two about the day'
+      errDate: 'Which day is it?',
+      errMessage: 'A line or two about the day',
+      bookingTitle: 'NEW BOOKING — MIGHTY STUDIO',
+      bookingDetails: 'Details',
+      bookingFrom: 'Sent from the Mighty Studio website'
     },
     footer: {
-      blurb: 'Photography and film for weddings, events and the brands behind them. Based in Tirana, travelling for the rest.',
+      blurb: 'Photography and film for weddings, events and the brands behind them. Based in Durrës, travelling for the rest.',
       index: 'Index',
       services: 'Services',
       copyright: 'Mighty Studio. All rights reserved.',
@@ -121,9 +129,9 @@ export const UI = {
       phraseScript: 'përjetësi',
       wordmark: 'Mighty Studio',
       tagline: 'Fotografi dhe Film',
-      side: 'Tiranë · Shqipëri',
+      side: 'Durrës · Shqipëri',
       disciplines: ['Dasma', 'Propozime', 'Evente', 'Koncerte'],
-      since: 'Me bazë në Tiranë'
+      since: 'Me bazë në Durrës'
     },
     about: {
       eyebrow: 'Studioja',
@@ -159,13 +167,17 @@ export const UI = {
       eyebrow: 'Kontakt',
       title: ['Le të nisim', 'bashkëpunimin.'],
       body: 'Na tregoni datën, vendin dhe çfarë ka më shumë rëndësi për ju. Çdo kërkesë merr përgjigje nga studioja brenda një dite pune.',
-      address: 'Tiranë, Shqipëri. Vizitat në studio me takim paraprak.',
+      address: 'Durrës, Shqipëri. Vizitat në studio me takim paraprak.',
       name: 'Emri',
       namePlaceholder: 'Emri juaj',
       email: 'Email',
       emailPlaceholder: 'ju@shembull.com',
       project: 'Shërbimi',
       projectPlaceholder: 'Zgjidhni një shërbim',
+      date: 'Data',
+      datePlaceholder: 'Dita e eventit',
+      place: 'Vendi',
+      placePlaceholder: 'Ambienti, qyteti',
       budget: 'Buxheti',
       budgetPlaceholder: 'Opsionale',
       brief: 'Përshkrimi',
@@ -180,10 +192,14 @@ export const UI = {
       errName: 'Na tregoni emrin tuaj',
       errEmail: 'Një email i vlefshëm, ju lutem',
       errType: 'Zgjidhni një shërbim',
-      errMessage: 'Dy fjalë për ditën tuaj'
+      errDate: 'Cilën ditë e keni?',
+      errMessage: 'Dy fjalë për ditën tuaj',
+      bookingTitle: 'REZERVIM I RI — MIGHTY STUDIO',
+      bookingDetails: 'Detajet',
+      bookingFrom: 'Dërguar nga faqja e Mighty Studio'
     },
     footer: {
-      blurb: 'Fotografi dhe film për dasma, evente dhe brendet pas tyre. Me bazë në Tiranë, dhe udhëtojmë për pjesën tjetër.',
+      blurb: 'Fotografi dhe film për dasma, evente dhe brendet pas tyre. Me bazë në Durrës, dhe udhëtojmë për pjesën tjetër.',
       index: 'Faqet',
       services: 'Shërbimet',
       copyright: 'Mighty Studio. Të gjitha të drejtat e rezervuara.',
@@ -599,5 +615,5 @@ export const FOOTER_SOCIAL = [
   { icon: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/mighty_studioo/' },
   { icon: 'facebook', label: 'Facebook', href: 'https://www.facebook.com/profile.php?id=61556569860655' },
   { icon: 'whatsapp', label: 'WhatsApp', href: 'https://wa.me/355692921229' },
-  { icon: 'tiktok', label: 'TikTok', href: 'https://tiktok.com/@mightystudio' }
+  { icon: 'tiktok', label: 'TikTok', href: 'https://www.tiktok.com/@mighty_studioo' }
 ];
