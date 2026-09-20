@@ -30,6 +30,14 @@ export function useParticleCamera(canvasRef, hostRef) {
 
     const reduced = prefersReducedMotion();
     const coarse = isCoarsePointer();
+    // The cloud only runs a physics loop for a fine pointer. Where it is
+    // static it costs nothing per frame, so it is sampled at the screen's own
+    // density instead — on a phone that is the difference between a soft
+    // smear and single, sharp points.
+    const animate = !reduced && !coarse;
+    const dpr = animate ? 1 : Math.min(window.devicePixelRatio || 1, 2);
+    const budgetMax = Math.round(MAX_PARTICLES * dpr * dpr);
+    const repelR = REPEL_RADIUS * dpr;
 
     let disposed = false;
     let img = null;
@@ -46,8 +54,8 @@ export function useParticleCamera(canvasRef, hostRef) {
       if (!img) return;
 
       const rect = host.getBoundingClientRect();
-      W = Math.max(1, Math.round(rect.width));
-      H = Math.max(1, Math.round(rect.height));
+      W = Math.max(1, Math.round(rect.width * dpr));
+      H = Math.max(1, Math.round(rect.height * dpr));
       canvas.width = W;
       canvas.height = H;
 
@@ -70,8 +78,8 @@ export function useParticleCamera(canvasRef, hostRef) {
         if (luma > LUMA_FLOOR) candidates++;
       }
 
-      const keep = candidates > MAX_PARTICLES ? MAX_PARTICLES / candidates : 1;
-      const budget = Math.min(candidates, MAX_PARTICLES);
+      const keep = candidates > budgetMax ? budgetMax / candidates : 1;
+      const budget = Math.min(candidates, budgetMax);
 
       ox = new Float32Array(budget);
       oy = new Float32Array(budget);
@@ -123,7 +131,7 @@ export function useParticleCamera(canvasRef, hostRef) {
     function step() {
       const mx = pointer.x;
       const my = pointer.y;
-      const r2 = REPEL_RADIUS * REPEL_RADIUS;
+      const r2 = repelR * repelR;
 
       for (let i = 0; i < count; i++) {
         const dx = px[i] - mx;
@@ -132,7 +140,7 @@ export function useParticleCamera(canvasRef, hostRef) {
 
         if (d2 < r2 && d2 > 0.0001) {
           const d = Math.sqrt(d2);
-          const f = (1 - d / REPEL_RADIUS) * REPEL_FORCE;
+          const f = (1 - d / repelR) * REPEL_FORCE;
           vx[i] += (dx / d) * f;
           vy[i] += (dy / d) * f;
         }
@@ -148,8 +156,8 @@ export function useParticleCamera(canvasRef, hostRef) {
     const onResize = throttleRAF(build);
     const onMove = e => {
       const rect = canvas.getBoundingClientRect();
-      pointer.x = e.clientX - rect.left;
-      pointer.y = e.clientY - rect.top;
+      pointer.x = (e.clientX - rect.left) * dpr;
+      pointer.y = (e.clientY - rect.top) * dpr;
     };
     const onLeave = () => {
       pointer.x = -9999;
@@ -170,7 +178,7 @@ export function useParticleCamera(canvasRef, hostRef) {
         img = loader;
         build();
         window.addEventListener('resize', onResize, { passive: true });
-        if (reduced || coarse) return;
+        if (!animate) return;
         window.addEventListener('pointermove', onMove, { passive: true });
         window.addEventListener('pointerleave', onLeave);
         Ticker.add(step);

@@ -18,6 +18,7 @@ const EXIT_MS = 620;
 export default function Lightbox({ item, index, total, originRect, onClose, onPrev, onNext }) {
   const frameRef = useRef(null);
   const closeRef = useRef(null);
+  const flewIn = useRef(false);
   const [leaving, setLeaving] = useState(false);
   const { t, pick } = useLang();
   const open = Boolean(item);
@@ -37,12 +38,19 @@ export default function Lightbox({ item, index, total, originRect, onClose, onPr
     return `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px) scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`;
   }, [originRect]);
 
-  // play in, from the card
+  // play in, from the card — once per opening. Stepping between images must
+  // not replay the flight, or every swipe would throw the frame back down to
+  // the card it came from and fly it up again.
+  useEffect(() => {
+    if (!open) flewIn.current = false;
+  }, [open]);
+
   useLayoutEffect(() => {
-    if (!open || prefersReducedMotion()) return;
+    if (!open || prefersReducedMotion() || flewIn.current) return;
     const el = frameRef.current;
     const from = originTransform();
     if (!el || !from) return;
+    flewIn.current = true;
 
     el.style.transition = 'none';
     el.style.transform = from;
@@ -71,6 +79,59 @@ export default function Lightbox({ item, index, total, originRect, onClose, onPr
       onClose();
     }, EXIT_MS);
   }, [leaving, onClose, originTransform]);
+
+  // On a phone the arrows are a poor second to the gesture everyone already
+  // tries: the frame follows the finger and the release decides the image.
+  useEffect(() => {
+    const el = frameRef.current;
+    if (!open || !el) return undefined;
+    let start = null;
+
+    const down = e => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      start = { x: e.clientX, moved: false };
+    };
+    const move = e => {
+      if (!start) return;
+      const dx = e.clientX - start.x;
+      if (!start.moved && Math.abs(dx) < 6) return;
+      start.moved = true;
+      el.style.transition = 'none';
+      // damped, so the frame reads as held rather than thrown
+      el.style.transform = `translate3d(${(dx * 0.55).toFixed(1)}px,0,0)`;
+    };
+    const up = e => {
+      if (!start) return;
+      const dx = (e.clientX ?? start.x) - start.x;
+      const moved = start.moved;
+      start = null;
+      if (moved) {
+        el.style.transition = 'transform 520ms var(--e-out-expo)';
+        el.style.transform = '';
+      }
+      if (Math.abs(dx) > 56) (dx < 0 ? onNext : onPrev)();
+    };
+    const cancel = () => {
+      if (!start) return;
+      const moved = start.moved;
+      start = null;
+      if (moved) {
+        el.style.transition = 'transform 520ms var(--e-out-expo)';
+        el.style.transform = '';
+      }
+    };
+
+    el.addEventListener('pointerdown', down);
+    el.addEventListener('pointermove', move);
+    el.addEventListener('pointerup', up);
+    el.addEventListener('pointercancel', cancel);
+    return () => {
+      el.removeEventListener('pointerdown', down);
+      el.removeEventListener('pointermove', move);
+      el.removeEventListener('pointerup', up);
+      el.removeEventListener('pointercancel', cancel);
+    };
+  }, [open, onNext, onPrev]);
 
   useEffect(() => {
     if (!open) return undefined;

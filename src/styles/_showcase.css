@@ -24,6 +24,8 @@
   cursor:grab;
   touch-action:pan-y;
   isolation:isolate;
+  user-select:none;-webkit-user-select:none;
+  -webkit-tap-highlight-color:transparent;
 }
 .showcase__frames:active,.showcase__frames.is-dragging{cursor:grabbing;}
 .showcase__frames{transition:transform 620ms var(--e-out-expo);}
@@ -54,18 +56,32 @@
 
 .slide{
   position:absolute;inset:0;margin:0;
+  overflow:hidden;
+  visibility:hidden;
+  /* parked at its own multiple of the frame: the deck is a rail, not a stack */
+  transform:translate3d(calc(var(--o) * 100%),0,0);
+  backface-visibility:hidden;
+}
+/* only the slide either side of the active one is mounted on the rail, so
+   the far slides can re-park themselves without ever crossing the frame */
+.slide.is-near{
+  visibility:visible;
+  transform:translate3d(calc(var(--o) * 100% + var(--dx,0px)),0,0);
+  transition:transform 880ms var(--e-out-expo);
+  will-change:transform;
+}
+/* under the finger there is no easing: the artwork tracks the drag exactly */
+.showcase__frames.is-dragging .slide.is-near{transition:none;}
+
+.slide img{
+  width:100%;height:100%;object-fit:cover;display:block;
   filter:grayscale(1) sepia(.12) contrast(1.04) brightness(1.04);
-  opacity:0;
-  transform:scale(1.08);
-  transition:opacity 1400ms var(--e-out-expo),transform 1400ms var(--e-out-expo);
-  will-change:opacity,transform;
+  transform:scale(1.04);
+  -webkit-user-drag:none;user-select:none;pointer-events:none;
 }
-.slide img{width:100%;height:100%;object-fit:cover;display:block;}
-.slide.is-on{
-  opacity:1;
-  /* a slow drift across the frame while the slide holds */
-  animation:kenBurns 9s var(--e-in-out) forwards;
-}
+/* a slow drift across the frame while the slide holds — on the image, so it
+   never fights the push happening on the figure above it */
+.slide.is-on img{animation:kenBurns 9s var(--e-in-out) forwards;}
 @keyframes kenBurns{
   from{transform:scale(1.02) translate3d(0,0,0);}
   to{transform:scale(1.12) translate3d(-1.2%,-1.4%,0);}
@@ -138,7 +154,8 @@
   .showcase__hint{right:auto;left:clamp(1.5rem,4vw,3.4rem);bottom:auto;top:clamp(1rem,3vw,1.6rem);}
 }
 @media (prefers-reduced-motion:reduce){
-  .slide.is-on{animation:none;transform:scale(1.02);}
+  .slide.is-near{transition:none;}
+  .slide.is-on img{animation:none;transform:scale(1.02);}
   .showcase__hint span::after{animation:none;transform:none;}
   .showcase__name{animation:none;}
   .showcase__tab.is-on .showcase__tabbar i{animation:none;transform:scaleX(1);}

@@ -1,0 +1,198 @@
+/* ============================================================
+   16. PHONE & TOUCH
+   Imported after every section, so these are the last word on
+   small screens. Three concerns, in order: the notch, the fact
+   that a finger is not a pointer, and what a phone can afford
+   to paint every frame.
+   ============================================================ */
+
+/* --- 16.1 safe areas ------------------------------------------
+   A notch or a home indicator eats into the viewport, and the
+   page is edge to edge. Anything that hugs an edge is padded off
+   it, rather than the whole document being inset. */
+@supports (padding:env(safe-area-inset-left)){
+  .shell{
+    padding-left:calc(var(--gutter) + env(safe-area-inset-left));
+    padding-right:calc(var(--gutter) + env(safe-area-inset-right));
+  }
+  .nav{
+    padding-top:calc(clamp(1rem,2.1vw,1.55rem) + env(safe-area-inset-top));
+    padding-left:calc(var(--gutter) + env(safe-area-inset-left));
+    padding-right:calc(var(--gutter) + env(safe-area-inset-right));
+  }
+  .nav__links{
+    padding:env(safe-area-inset-top) env(safe-area-inset-right)
+            env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  .lightbox{
+    padding:
+      calc(clamp(1rem,4vw,3rem) + env(safe-area-inset-top))
+      calc(clamp(1rem,4vw,3rem) + env(safe-area-inset-right))
+      calc(clamp(1rem,4vw,3rem) + env(safe-area-inset-bottom))
+      calc(clamp(1rem,4vw,3rem) + env(safe-area-inset-left));
+  }
+  .footer{padding-bottom:calc(clamp(1.8rem,3vw,2.6rem) + env(safe-area-inset-bottom));}
+  .hero__strip{
+    padding-left:calc(clamp(2.6rem,6vw,5.2rem) + env(safe-area-inset-left));
+    padding-right:calc(clamp(2.6rem,6vw,5.2rem) + env(safe-area-inset-right));
+  }
+}
+
+/* --- 16.2 touch: hover is a lie -------------------------------
+   A tap leaves :hover and :focus-within latched on until the next
+   tap elsewhere, so every hover reward would stick to whatever was
+   last touched. Where the hover state carries information it is
+   promoted to the resting state; where it is decoration it is
+   switched off. */
+@media (hover:none){
+  a,button,[role="button"],input,select,textarea,summary{
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  /* nav */
+  .nav__link:hover{color:var(--grey-8a);}
+  .nav__link:hover::after{transform:scaleX(0);}
+  .nav__link.is-active{color:var(--accent);}
+  .nav__link.is-active::after{transform:scaleX(1);transform-origin:0 50%;}
+  .nav__brand:hover{opacity:1;}
+  .nav__cta:hover{background:none;color:inherit;border-color:var(--line-strong);}
+  .lang__btn:hover{color:var(--grey-8a);}
+  .lang__btn.is-on{background:var(--accent);color:#000000;}
+
+  /* the marquee must not stop because a finger brushed past it */
+  .marquee__track:hover{animation-play-state:running;}
+  .marquee__item:hover{color:var(--grey-4a);}
+
+  /* services */
+  .svc__row:hover::before,.svc__row:focus-within::before{transform:scaleX(0);}
+  .svc__row:hover .svc__name{transform:none;}
+  .process__step:hover b{color:var(--white);}
+
+  /* buttons and chips keep their own committed state, nothing else */
+  .btn:hover{color:var(--black);}
+  .btn:hover::before{transform:translate3d(0,101%,0);}
+  .chip:hover{color:var(--grey-c7);border-color:var(--line);}
+  .chip.is-on{color:var(--black);border-color:var(--white);}
+  .chip.is-on::before{transform:none;}
+
+  /* footer */
+  .footer__logo:hover{color:var(--white);}
+  .footer__contact a:hover{color:var(--grey-c7);border-color:var(--line);}
+  .footer__links a:hover{color:var(--grey-8a);}
+  .footer__links a::after{display:none;}
+  .footer__legal a:hover{color:var(--grey-4a);}
+  .footer__social-link:hover{color:var(--grey-c7);border-color:var(--line);}
+  .footer__social-link:hover::before{transform:scale(0);}
+  .contact__links a:hover{color:var(--grey-c7);border-color:var(--line);gap:.6rem;}
+
+  /* portfolio: the caption is the point, so it is simply always there,
+     and the pointer-only garnish is dropped rather than neutralised */
+  .pcard__body{transform:none;}
+  .pcard__sub{opacity:1;transform:none;}
+  .pcard__cat{color:rgba(255,255,255,.88);}
+  .pcard__veil{opacity:.74;}
+  .pcard__gleam,.pcard__view{display:none;}
+  .pcard:hover .pcard__art,
+  .pcard:focus-within .pcard__art{
+    transform:scale(1.01);filter:grayscale(1) sepia(.12) contrast(1.04);
+  }
+  .pcard:hover .pcard__hit{box-shadow:none;}
+  .pcard:hover{border-color:var(--line);}
+  .lightbox__nav button:hover,.lightbox__close:hover{
+    background:none;color:inherit;border-color:var(--line-strong);
+  }
+
+  /* --- tap targets ---------------------------------------------
+     A finger needs about 44px; text links in a tight list do not
+     get there on their own, so they are given the height without
+     being given the space. */
+  .footer__links a,.footer__legal a,.footer__contact a{
+    display:inline-flex;align-items:center;min-height:44px;
+  }
+  .footer__links{gap:0;}
+  .showcase__tab{min-height:58px;align-content:center;}
+  .nav__burger{width:46px;height:46px;}
+  .lang__btn{padding:.6rem .95rem;}
+
+  /* --- what a phone can afford ---------------------------------
+     The grain is a full-bleed layer at twice the viewport in each
+     direction. Re-compositing it three times a second is the most
+     expensive thing on the page and the least visible, so on touch
+     it holds still. */
+  .grain{animation:none;opacity:.05;}
+  .vignette{background:radial-gradient(135% 100% at 50% 45%,transparent 46%,rgba(0,0,0,.55) 84%,rgba(0,0,0,.9) 100%);}
+}
+
+/* --- 16.3 the hero on a phone ---------------------------------
+   Portrait puts the camera above the statement, and everything has
+   to clear the strip at the foot without the section growing past
+   one screen. */
+@media (max-width:640px){
+  .hero__inner{padding-block:6.4rem 5.6rem;gap:1.5rem;}
+  .hero__camera{max-width:min(80vw,330px);}
+  .wordmark .ltr{font-size:clamp(2rem,8.8vw,2.95rem);line-height:1.1;}
+  .wordmark .ltr--script{font-size:clamp(2.3rem,10.2vw,3.45rem);}
+  .hero__sign{margin-top:1.25rem;}
+  .hero__logo{height:30px;}
+  .hero__strip{bottom:1.3rem;gap:.9rem;}
+  .hero__scale{height:8px;background-size:64px 8px,18px 4px;}
+}
+/* very narrow: the scale ruler is the first thing to go, it is decoration */
+@media (max-width:380px){
+  .hero__disciplines li:nth-child(n+2){display:none;}
+  .hero__camera{max-width:74vw;}
+}
+/* landscape on a phone has no vertical room for a full-height hero */
+@media (max-height:540px) and (orientation:landscape){
+  .hero{min-height:auto;}
+  .hero__inner{
+    grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);
+    padding-block:5.5rem 4rem;gap:2rem;
+  }
+  .hero__camera{order:0;max-width:300px;margin-inline:0;}
+  .hero__strip{display:none;}
+}
+
+/* --- 16.4 the slideshow on a phone ----------------------------- */
+@media (max-width:640px){
+  .showcase__frames{height:clamp(360px,64vh,470px);}
+  .showcase__caption{max-width:100%;padding:1.15rem 1.2rem 1.35rem;gap:.42rem;}
+  .showcase__name{font-size:clamp(1.65rem,7.4vw,2.4rem);}
+  .showcase__desc{font-size:.94rem;line-height:1.62;}
+  .showcase__count{font-size:.78rem;}
+  .showcase__tabs{grid-template-columns:repeat(2,minmax(0,1fr));gap:.9rem 1.1rem;}
+  .showcase__tabname{font-size:.92rem;line-height:1.35;}
+  .showcase__head{gap:1.2rem;}
+  .showcase__intro{max-width:none;}
+}
+
+/* --- 16.5 the rest of the page --------------------------------- */
+@media (max-width:640px){
+  /* services */
+  .svc__row{grid-template-columns:2.4rem minmax(0,1fr);row-gap:.7rem;gap:.9rem;}
+  .svc__desc{grid-column:2;max-width:none;}
+  .svc__tags{grid-column:2;justify-content:flex-start;gap:.45rem;}
+  .svc__tags span{font-size:.8rem;padding:.42rem .85rem;}
+
+  /* contact — a long address must wrap rather than widen the page */
+  .contact__links a{font-size:1.05rem;word-break:break-word;}
+  .form__foot{gap:1rem;}
+  .form__foot .btn{width:100%;justify-content:center;}
+
+  /* about */
+  .about__media{max-width:none;}
+  .stat b{font-size:clamp(1.9rem,9vw,2.6rem);}
+
+  /* lightbox */
+  .lightbox__frame{max-height:52vh;touch-action:pan-y;}
+  .lightbox__frame img{max-height:52vh;}
+  .lightbox__title{font-size:clamp(1.5rem,6.6vw,2.2rem);}
+  .lightbox__facts > div{grid-template-columns:minmax(0,5.5rem) minmax(0,1fr);gap:.7rem;padding-top:.7rem;}
+  .lightbox__facts{gap:.6rem;}
+  .lightbox__close{top:.6rem;right:.6rem;width:44px;height:44px;}
+  .lightbox__nav button{width:46px;height:46px;}
+  .lightbox__meta{gap:.9rem;}
+}
+/* the frame is dragged sideways at every width, so it must never swallow
+   the vertical scroll that gets you out of a tall overlay */
+.lightbox__frame{touch-action:pan-y;}
