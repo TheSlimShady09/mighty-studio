@@ -1,0 +1,19 @@
+/* ============================================================
+   16. REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  *,*::before,*::after{
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+    scroll-behavior:auto !important;
+  }
+  .grain{animation:none;opacity:.035;}
+  .marquee__track{animation:none;}
+  .wordmark .ltr{opacity:1;transform:none;filter:none;}
+  .hero__sign{opacity:1;transform:none;}
+  [data-reveal]{opacity:1;transform:none;filter:none;}
+  .line > span{transform:none;}
+  .cf-item{transition:none;}
+}

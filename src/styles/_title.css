@@ -1,0 +1,25 @@
+/* ============================================================
+   19. SECTION TITLES — the one place the serif speaks
+   High-contrast Didone, set in sentence case with real leading.
+   ============================================================ */
+.title{
+  font-family:var(--display);
+  font-weight:400;
+  text-transform:none;
+  font-size:clamp(2rem,4.8vw,4.4rem);
+  line-height:1.2;
+  letter-spacing:-.02em;
+  max-width:18ch;
+}
+.title em{font-family:var(--script);font-style:normal;font-size:1.18em;color:var(--accent);letter-spacing:0;}
+.title--sm{font-size:clamp(1.9rem,3.4vw,3rem);max-width:22ch;}
+
+/* the serif has real descenders, so a clipped line needs room for them */
+.lines .line{padding-bottom:.22em;margin-bottom:-.22em;}
+.lines.title{display:grid;gap:.06em;}
+
+/* the studio statement sits in a half-width column, so it needs its own size
+   to keep the authored line breaks intact */
+.about__statement.title{font-size:clamp(1.9rem,3.9vw,3.5rem);max-width:22ch;}
+.footer__lead.title{max-width:14ch;}
+.portfolio__title.title{max-width:none;}

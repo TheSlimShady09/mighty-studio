@@ -1,0 +1,53 @@
+/* ============================================================
+   9. ABOUT
+   ============================================================ */
+.about__grid{align-items:start;}
+.about__copy{grid-column:1 / span 6;display:grid;gap:clamp(2rem,3.4vw,3rem);}
+.about__media{grid-column:8 / span 5;}
+.about__statement{
+  font-family:var(--display);text-transform:uppercase;
+  font-size:clamp(1.7rem,3.5vw,3.3rem);line-height:1.02;letter-spacing:-.005em;
+}
+.about__statement em{font-style:normal;color:var(--grey-4a);}
+.about__statement{margin-bottom:.6rem;}
+
+
+/* parallax frame */
+.frame{
+  position:relative;overflow:hidden;background:var(--ink-0e);
+  aspect-ratio:4/5;border:1px solid var(--line);border-radius:var(--r-lg);
+}
+.frame__layer{position:absolute;inset:-14% -4%;will-change:transform;filter:sepia(.14);}
+.frame__layer svg{width:100%;height:100%;}
+.frame__grade{
+  position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(200deg,rgba(255,255,255,.06),transparent 42%),
+             radial-gradient(90% 70% at 50% 40%,transparent 30%,rgba(0,0,0,.72) 100%);
+}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:clamp(1.5rem,2.6vw,2.6rem);margin-top:clamp(3.5rem,6vw,5rem);}
+.stat{border-top:1px solid var(--line);padding-top:1.4rem;display:grid;gap:.5rem;}
+.stat b{display:block;font-family:var(--display);font-size:clamp(2rem,4vw,3.4rem);line-height:1;}
+.stat span{font-size:var(--fs-body);letter-spacing:.01em;color:var(--grey-4a);}
+
+
+/* --- what each discipline includes --------------------------- */
+.specs{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:clamp(2rem,4vw,4rem);
+  margin-top:clamp(3rem,6vw,5rem);
+}
+.spec{display:grid;gap:1.4rem;align-content:start;}
+.spec__title{
+  margin:0;font-family:var(--display);text-transform:uppercase;line-height:1;
+  font-size:clamp(1.3rem,2.2vw,1.9rem);color:var(--white);
+  padding-bottom:1rem;border-bottom:1px solid var(--line);
+}
+.spec__list{display:grid;gap:1rem;}
+.spec__list li{
+  display:grid;grid-template-columns:auto 1fr;gap:.9rem;align-items:baseline;
+  color:var(--grey-c7);line-height:1.7;
+}
+.spec__list li::before{
+  content:"";width:6px;height:6px;border-radius:50%;
+  background:var(--accent);transform:translateY(-.15em);
+}

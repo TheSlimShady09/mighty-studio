@@ -1,0 +1,149 @@
+/* ============================================================
+   6. HERO
+   ============================================================ */
+.hero{
+  position:relative;min-height:100vh;min-height:100svh;
+  display:grid;align-items:center;
+  overflow:hidden;isolation:isolate;
+  background:var(--black);
+}
+.hero__inner{
+  position:relative;z-index:var(--z-content);width:100%;
+  padding-block:8rem 6rem;will-change:transform,opacity;
+  display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);
+  align-items:center;gap:clamp(1.5rem,4vw,4rem);
+}
+.hero__copy{display:grid;justify-items:start;text-align:left;}
+.hero__camera{
+  position:relative;
+  aspect-ratio:1141 / 814;
+  width:100%;
+}
+/* the camera sits on black, as in the original frame. Faded at the edges so
+   it reads as depth rather than a box pasted over the haze. */
+.hero__camera::before{
+  content:"";position:absolute;inset:-14%;
+  background:radial-gradient(closest-side at 50% 50%,
+    #000000 0%,#000000 52%,rgba(0,0,0,.72) 74%,rgba(0,0,0,0) 100%);
+  pointer-events:none;
+}
+.hero__camera canvas{
+  position:relative;
+  display:block;width:100%;height:100%;
+}
+
+/* wordmark — letters emerge from depth, blur to focus */
+.wordmark{
+  perspective:1100px;
+  perspective-origin:50% 50%;
+  display:flex;flex-direction:column;align-items:flex-start;
+}
+.wordmark__row{
+  display:flex;justify-content:flex-start;flex-wrap:wrap;align-items:baseline;
+  transform-style:preserve-3d;
+}
+/* words stay whole when a line wraps */
+.wordmark__word{display:inline-flex;transform-style:preserve-3d;}
+
+.wordmark .ltr{
+  display:inline-block;
+  font-family:var(--serif);font-weight:300;text-transform:none;
+  font-size:clamp(2.2rem,5.4vw,5rem);line-height:1.12;letter-spacing:-.005em;
+  color:var(--white);
+  transform-style:preserve-3d;
+  opacity:0;
+  transform:translate3d(0,.16em,-620px) rotateX(26deg) scale(1.16);
+  filter:blur(24px);
+  will-change:transform,opacity,filter;
+}
+.wordmark .ltr--space{width:.28em;}
+
+/* one word carried in the logo's script, as its own accent.
+   Declared after `.wordmark .ltr`: same specificity, so order decides. */
+.wordmark .ltr--script{
+  font-family:var(--script);
+  font-weight:400;
+  font-size:clamp(2.6rem,6.2vw,5.8rem);
+  line-height:.8;
+  letter-spacing:.01em;
+  color:var(--accent);
+}
+.is-ready .wordmark .ltr{
+  animation:letterIn 1500ms var(--e-out-expo) forwards;
+  animation-delay:calc(var(--i) * 26ms + 140ms);
+}
+@keyframes letterIn{
+  0%{opacity:0;transform:translate3d(0,.16em,-620px) rotateX(26deg) scale(1.16);filter:blur(24px);}
+  55%{opacity:1;}
+  100%{opacity:1;transform:translate3d(0,0,0) rotateX(0deg) scale(1);filter:blur(0);}
+}
+
+
+.hero__sign{
+  margin-top:clamp(1.8rem,4vh,3.2rem);
+  display:grid;justify-items:start;gap:.7rem;
+  color:var(--white);
+  opacity:0;transform:translate3d(0,18px,0);
+}
+.hero__logo{height:clamp(34px,4.6vw,58px);}
+
+.is-ready .hero__sign{animation:fadeUp 1400ms var(--e-out-expo) 1150ms forwards;}
+
+
+@media (max-width:900px){
+  .hero__inner{grid-template-columns:minmax(0,1fr);gap:2rem;padding-block:7rem 4rem;}
+  .hero__camera{order:-1;max-width:460px;margin-inline:auto;}
+}
+
+/* ============================================================
+   HERO DETAILS — the small marks a viewfinder puts on a frame
+   ============================================================ */
+
+/* the studio's place, set on its side along the edge */
+.hero__side{
+  position:absolute;left:clamp(.9rem,2vw,1.9rem);top:50%;
+  z-index:1;margin:0;
+  writing-mode:vertical-rl;
+  transform:translateY(-50%) rotate(180deg);
+  font-size:var(--fs-micro);letter-spacing:.32em;text-transform:uppercase;
+  color:var(--grey-4a);pointer-events:none;
+}
+
+/* a distance scale along the foot of the frame */
+.hero__strip{
+  position:absolute;left:0;right:0;bottom:clamp(1.6rem,3.4vw,2.8rem);
+  z-index:1;pointer-events:none;
+  display:flex;align-items:center;gap:clamp(1rem,2.4vw,2rem);
+  padding-inline:clamp(2.6rem,6vw,5.2rem);
+  opacity:0;
+}
+.is-ready .hero__strip{animation:fadeUp 1400ms var(--e-out-expo) 1500ms forwards;}
+.hero__since,
+.hero__disciplines li{
+  font-size:var(--fs-micro);letter-spacing:.24em;text-transform:uppercase;
+  color:var(--grey-4a);white-space:nowrap;
+}
+.hero__scale{
+  flex:1;height:10px;
+  background-image:
+    linear-gradient(90deg,var(--accent-soft) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.1) 1px,transparent 1px);
+  background-size:96px 10px,24px 5px;
+  background-position:0 0,0 bottom;
+  background-repeat:repeat-x;
+}
+.hero__disciplines{display:flex;gap:clamp(.8rem,1.8vw,1.6rem);}
+.hero__disciplines li{color:var(--grey-8a);}
+.hero__disciplines li:first-child{color:var(--accent);}
+
+@media (max-width:900px){
+  .hero__side{display:none;}
+  .hero__strip{padding-inline:clamp(1.25rem,5vw,2rem);gap:1rem;}
+  .hero__disciplines li:nth-child(n+3){display:none;}
+}
+@media (max-width:560px){
+  .hero__since{display:none;}
+}
+@media (prefers-reduced-motion:reduce){
+  .hero__strip{opacity:1;animation:none;}
+}

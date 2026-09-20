@@ -1,0 +1,145 @@
+/* ============================================================
+   10. SHOWCASE — self-advancing slideshow of disciplines
+   ============================================================ */
+.showcase{overflow:hidden;}
+.showcase__head{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:clamp(1.5rem,4vw,4rem);flex-wrap:wrap;
+  margin-bottom:clamp(2rem,4vw,3.2rem);
+}
+.showcase__intro{max-width:34ch;}
+
+/* --- stage --------------------------------------------------- */
+.showcase__stage{
+  position:relative;
+  padding-inline:clamp(0px,3vw,var(--gutter));
+}
+.showcase__frames{
+  position:relative;
+  height:clamp(420px,64vh,760px);
+  overflow:hidden;
+  border-radius:var(--r-xl);
+  background:var(--ink-0e);
+  border:1px solid var(--line);
+  cursor:grab;
+  touch-action:pan-y;
+  isolation:isolate;
+}
+.showcase__frames:active,.showcase__frames.is-dragging{cursor:grabbing;}
+.showcase__frames{transition:transform 620ms var(--e-out-expo);}
+.showcase__frames.is-dragging{transform:scale(.994);}
+
+/* discoverability, now that there are no arrows */
+.showcase__hint{
+  position:absolute;right:clamp(1.2rem,3vw,2.6rem);bottom:clamp(1.4rem,3vw,2.6rem);
+  z-index:3;margin:0;display:inline-flex;align-items:center;gap:.7rem;
+  font-size:var(--fs-micro);letter-spacing:.22em;text-transform:uppercase;
+  color:rgba(255,255,255,.66);pointer-events:none;
+}
+.showcase__hint span{
+  width:clamp(28px,4vw,46px);height:1px;background:rgba(255,255,255,.4);
+  position:relative;overflow:hidden;display:block;
+}
+.showcase__hint span::after{
+  content:"";position:absolute;inset:0;background:var(--accent);
+  transform:translateX(-100%);
+  animation:hintSweep 2.8s var(--e-in-out) infinite;
+}
+@keyframes hintSweep{
+  0%{transform:translateX(-100%);}
+  55%{transform:translateX(100%);}
+  100%{transform:translateX(100%);}
+}
+.showcase__frames:focus-visible{outline:1px solid var(--accent);outline-offset:3px;}
+
+.slide{
+  position:absolute;inset:0;margin:0;
+  filter:grayscale(1) sepia(.12) contrast(1.04) brightness(1.04);
+  opacity:0;
+  transform:scale(1.08);
+  transition:opacity 1400ms var(--e-out-expo),transform 1400ms var(--e-out-expo);
+  will-change:opacity,transform;
+}
+.slide img{width:100%;height:100%;object-fit:cover;display:block;}
+.slide.is-on{
+  opacity:1;
+  /* a slow drift across the frame while the slide holds */
+  animation:kenBurns 9s var(--e-in-out) forwards;
+}
+@keyframes kenBurns{
+  from{transform:scale(1.02) translate3d(0,0,0);}
+  to{transform:scale(1.12) translate3d(-1.2%,-1.4%,0);}
+}
+
+.showcase__scrim{
+  position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(180deg,rgba(0,0,0,.4) 0%,transparent 38%,rgba(0,0,0,.8) 100%),
+    linear-gradient(90deg,rgba(0,0,0,.5) 0%,transparent 50%);
+}
+
+/* --- caption ------------------------------------------------- */
+.showcase__caption{
+  position:absolute;left:0;bottom:0;z-index:2;
+  display:grid;gap:.7rem;
+  padding:clamp(1.5rem,4vw,3.4rem);
+  max-width:min(46ch,86%);
+  pointer-events:none;
+}
+.showcase__count{
+  margin:0;font-family:var(--mono);font-size:.9rem;letter-spacing:.16em;color:var(--accent);
+}
+.showcase__count span{color:var(--grey-8a);}
+.showcase__name{
+  margin:0;color:#FFFFFF;max-width:none;
+  font-size:clamp(2.2rem,5.4vw,4.6rem);
+  animation:nameIn 900ms var(--e-out-expo) both;
+}
+@keyframes nameIn{
+  from{opacity:0;transform:translate3d(0,26px,0);}
+  to{opacity:1;transform:none;}
+}
+.showcase__desc{
+  margin:0;color:var(--grey-c7);
+  font-size:clamp(.98rem,1.15vw,1.15rem);line-height:1.7;
+}
+
+/* --- tabs ---------------------------------------------------- */
+.showcase__tabs{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:clamp(.8rem,2vw,2rem);
+  margin-top:clamp(1.6rem,3vw,2.6rem);
+}
+.showcase__tab{
+  position:relative;display:grid;gap:.35rem;width:100%;text-align:left;
+  padding-top:1rem;color:var(--grey-8a);
+  transition:color 460ms var(--e-out-expo);
+}
+.showcase__tabnum{font-family:var(--mono);font-size:.78rem;letter-spacing:.14em;color:var(--grey-4a);}
+.showcase__tabname{
+  font-size:clamp(.95rem,1.2vw,1.15rem);letter-spacing:.01em;
+}
+.showcase__tabbar{
+  position:absolute;top:0;left:0;right:0;height:1px;background:var(--line);overflow:hidden;
+}
+.showcase__tabbar i{
+  display:block;height:100%;width:100%;background:var(--accent);
+  transform-origin:0 50%;transform:scaleX(0);
+}
+.showcase__tab.is-on{color:#FFFFFF;}
+.showcase__tab.is-on .showcase__tabnum{color:var(--accent);}
+.showcase__tab.is-on .showcase__tabbar i{animation:tabFill linear forwards;}
+.showcase__tab:hover{color:var(--grey-c7);}
+@keyframes tabFill{from{transform:scaleX(0);}to{transform:scaleX(1);}}
+
+@media (max-width:700px){
+  .showcase__frames{height:clamp(380px,58vh,520px);}
+  .showcase__tabs{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .showcase__hint{right:auto;left:clamp(1.5rem,4vw,3.4rem);bottom:auto;top:clamp(1rem,3vw,1.6rem);}
+}
+@media (prefers-reduced-motion:reduce){
+  .slide.is-on{animation:none;transform:scale(1.02);}
+  .showcase__hint span::after{animation:none;transform:none;}
+  .showcase__name{animation:none;}
+  .showcase__tab.is-on .showcase__tabbar i{animation:none;transform:scaleX(1);}
+}
