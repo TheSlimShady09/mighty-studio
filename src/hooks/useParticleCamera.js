@@ -9,6 +9,10 @@ const REPEL_FORCE = 2.6;
 const SPRING = 0.016; // pull back towards the resting position
 const DAMPING = 0.9;
 
+// The scatter is finished before the hero has fully left, so the whole of it
+// happens where it can still be seen.
+const SPAN = 0.82;
+
 /**
  * The camera is the photograph itself, taken apart.
  *
@@ -18,8 +22,15 @@ const DAMPING = 0.9;
  * Positions and brightness are read straight off the photograph, so the shape
  * is the one in the file; the pointer then pushes those points apart and a
  * spring walks them home.
+ *
+ * Scrolling off the hero pulls the cloud apart and drops it down into the
+ * page. Every particle's flight is a pure function of the scroll position —
+ * no velocity is accumulated for it — so scrolling back up runs the same
+ * arithmetic backwards and the camera reassembles exactly as it was.
+ *
+ * `api` is filled with `{ setProgress }` for the hero to drive.
  */
-export function useParticleCamera(canvasRef, hostRef) {
+export function useParticleCamera(canvasRef, hostRef, api) {
   useEffect(() => {
     const canvas = canvasRef.current;
     const host = hostRef.current;
@@ -44,10 +55,14 @@ export function useParticleCamera(canvasRef, hostRef) {
     let W = 0;
     let H = 0;
     let count = 0;
-    let ox, oy, px, py, vx, vy, br;
+    let ox, oy, px, py, vx, vy, br, sx, sy, dl;
     let image = null;
     let buf32 = null;
     let running = false;
+    let progress = 0; // 0 while the hero is held, 1 once it has left
+    let spreadX = 0;
+    let spreadY = 0;
+    let fall = 0;
     const pointer = { x: -9999, y: -9999 };
 
     function build() {
@@ -88,7 +103,11 @@ export function useParticleCamera(canvasRef, hostRef) {
       vx = new Float32Array(budget);
       vy = new Float32Array(budget);
       br = new Uint8Array(budget);
+      sx = new Float32Array(budget); // scatter direction, across
+      sy = new Float32Array(budget); // scatter direction, down the frame
+      dl = new Float32Array(budget); // how late this one lets go
 
+      const cx = W / 2;
       let n = 0;
       for (let y = 0; y < H && n < budget; y++) {
         for (let x = 0; x < W && n < budget; x++) {
@@ -106,10 +125,22 @@ export function useParticleCamera(canvasRef, hostRef) {
           // more light: on screen this matches the photograph's weight
           const lifted = luma * 1.5;
           br[n] = lifted > 255 ? 255 : lifted;
+
+          // Scatter outward from the middle, with enough randomness that the
+          // cloud never reads as a grid coming apart.
+          sx[n] = (Math.random() * 2 - 1) * 0.85 + ((x - cx) / (W * 0.5)) * 0.45;
+          sy[n] = Math.random() * 0.8 - 0.15;
+          // The bottom of the camera lets go first, so the picture falls into
+          // the page rather than all of it leaving at once.
+          dl[n] = (1 - y / H) * 0.55 + Math.random() * 0.45;
           n++;
         }
       }
       count = n;
+
+      spreadX = W * 0.5;
+      spreadY = H * 0.28;
+      fall = H * 1.9;
 
       image = ctx.createImageData(W, H);
       buf32 = new Uint32Array(image.data.buffer);
@@ -117,13 +148,61 @@ export function useParticleCamera(canvasRef, hostRef) {
     }
 
     function render() {
+      if (!buf32) return;
       buf32.fill(0);
+
+      const pp = progress <= 0 ? 0 : progress >= SPAN ? 1 : progress / SPAN;
+
+      // held: the camera as photographed, and no per-particle arithmetic
+      if (pp === 0) {
+        for (let i = 0; i < count; i++) {
+          const x = px[i] | 0;
+          const y = py[i] | 0;
+          if (x < 0 || y < 0 || x >= W || y >= H) continue;
+          // little-endian ABGR: white, with the photograph's own brightness
+          buf32[y * W + x] = (br[i] << 24) | 0x00ffffff;
+        }
+        ctx.putImageData(image, 0, 0);
+        return;
+      }
+
+      // Reduced motion gets the same exit without the flight: it simply goes.
+      if (reduced) {
+        const k = 1 - pp;
+        for (let i = 0; i < count; i++) {
+          const x = px[i] | 0;
+          const y = py[i] | 0;
+          if (x < 0 || y < 0 || x >= W || y >= H) continue;
+          buf32[y * W + x] = ((br[i] * k) << 24) | 0x00ffffff;
+        }
+        ctx.putImageData(image, 0, 0);
+        return;
+      }
+
       for (let i = 0; i < count; i++) {
-        const x = px[i] | 0;
-        const y = py[i] | 0;
+        const lead = dl[i] * 0.45;
+        const t = (pp - lead) / (1 - lead);
+
+        if (t <= 0) {
+          const x = px[i] | 0;
+          const y = py[i] | 0;
+          if (x < 0 || y < 0 || x >= W || y >= H) continue;
+          buf32[y * W + x] = (br[i] << 24) | 0x00ffffff;
+          continue;
+        }
+        if (t >= 1) continue; // gone into the page
+
+        const inv = 1 - t;
+        const drift = 1 - inv * inv; // lateral spread eases out
+        const grav = t * t; // the fall accelerates
+        const x = (px[i] + sx[i] * drift * spreadX) | 0;
+        const y = (py[i] + sy[i] * drift * spreadY + grav * fall) | 0;
         if (x < 0 || y < 0 || x >= W || y >= H) continue;
-        // little-endian ABGR: white, with the photograph's own brightness
-        buf32[y * W + x] = (br[i] << 24) | 0x00ffffff;
+
+        // a small flare as each point detaches, then out
+        let a = br[i] * inv * (1 + 2 * t * inv);
+        if (a > 255) a = 255;
+        buf32[y * W + x] = (a << 24) | 0x00ffffff;
       }
       ctx.putImageData(image, 0, 0);
     }
@@ -153,6 +232,7 @@ export function useParticleCamera(canvasRef, hostRef) {
       render();
     }
 
+    const redraw = throttleRAF(render);
     const onResize = throttleRAF(build);
     const onMove = e => {
       const rect = canvas.getBoundingClientRect();
@@ -163,6 +243,20 @@ export function useParticleCamera(canvasRef, hostRef) {
       pointer.x = -9999;
       pointer.y = -9999;
     };
+
+    // The hero drives this on every scroll frame. Where a physics loop is
+    // already running it only stores the value; where there is none, it asks
+    // for a redraw, so a still page stays still.
+    if (api) {
+      api.current = {
+        setProgress(v) {
+          const next = v < 0 ? 0 : v > 1 ? 1 : v;
+          if (next === progress) return;
+          progress = next;
+          if (!animate) redraw();
+        }
+      };
+    }
 
     const loader = new Image();
     loader.decoding = 'async';
@@ -187,10 +281,11 @@ export function useParticleCamera(canvasRef, hostRef) {
 
     return () => {
       disposed = true;
+      if (api) api.current = null;
       window.removeEventListener('resize', onResize);
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerleave', onLeave);
       if (running) Ticker.remove(step);
     };
-  }, [canvasRef, hostRef]);
+  }, [canvasRef, hostRef, api]);
 }

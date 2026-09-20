@@ -24,6 +24,7 @@
   cursor:grab;
   touch-action:pan-y;
   isolation:isolate;
+  --dx:0px;
   user-select:none;-webkit-user-select:none;
   -webkit-tap-highlight-color:transparent;
 }
@@ -72,6 +73,10 @@
 }
 /* under the finger there is no easing: the artwork tracks the drag exactly */
 .showcase__frames.is-dragging .slide.is-near{transition:none;}
+/* except when the clock comes round mid-drag, which glides instead of cutting */
+.showcase__frames.is-dragging.is-stepping .slide.is-near{
+  transition:transform 880ms var(--e-out-expo);
+}
 
 .slide img{
   width:100%;height:100%;object-fit:cover;display:block;

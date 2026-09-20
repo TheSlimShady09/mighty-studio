@@ -32,7 +32,6 @@ function offsetOf(i, index, count) {
  */
 export default function Showcase() {
   const [index, setIndex] = useState(0);
-  const [dragX, setDragX] = useState(0);
   const [dragging, setDragging] = useState(false);
   const stageRef = useRef(null);
   const drag = useRef(null);
@@ -44,10 +43,15 @@ export default function Showcase() {
   const prev = useCallback(() => setIndex(i => (i - 1 + count) % count), [count]);
 
   // The clock runs whatever the pointer is doing: it is never paused, only
-  // re-armed each time the slide changes, however it changed.
+  // re-armed each time the slide changes, however it changed. If it comes
+  // round while a finger is down, the step is allowed to ease rather than
+  // cut, so the deck glides forward under the hand instead of jumping.
   useEffect(() => {
     if (prefersReducedMotion()) return undefined;
-    const timer = setTimeout(next, HOLD);
+    const timer = setTimeout(() => {
+      if (drag.current && stageRef.current) stageRef.current.classList.add('is-stepping');
+      next();
+    }, HOLD);
     return () => clearTimeout(timer);
   }, [index, next]);
 
@@ -70,7 +74,12 @@ export default function Showcase() {
       const d = drag.current;
       if (!d || e.pointerId !== d.id) return;
       d.last = e.clientX;
-      setDragX(e.clientX - d.x);
+      // the finger has taken over from any easing step still running
+      stage.classList.remove('is-stepping');
+      // Written straight to the element. Putting this in React state would
+      // re-render all five slides and the caption on every pointer event,
+      // which is what made the drag stutter under the cursor.
+      stage.style.setProperty('--dx', `${e.clientX - d.x}px`);
     };
 
     const up = e => {
@@ -78,7 +87,8 @@ export default function Showcase() {
       if (!d || (e.pointerId !== undefined && e.pointerId !== d.id)) return;
       drag.current = null;
       setDragging(false);
-      setDragX(0);
+      stage.classList.remove('is-stepping');
+      stage.style.setProperty('--dx', '0px');
 
       const dx = (e.clientX ?? d.last) - d.x;
       const dt = Math.max(1, performance.now() - d.t);
@@ -93,7 +103,8 @@ export default function Showcase() {
       if (!drag.current) return;
       drag.current = null;
       setDragging(false);
-      setDragX(0);
+      stage.classList.remove('is-stepping');
+      stage.style.setProperty('--dx', '0px');
     };
 
     stage.addEventListener('pointerdown', down);
@@ -147,7 +158,6 @@ export default function Showcase() {
           aria-roledescription="carousel"
           aria-label={t.showcase.label}
           onKeyDown={onKeyDown}
-          style={{ '--dx': `${dragX}px` }}
         >
           {SHOWCASE.map((slide, i) => {
             const o = offsetOf(i, index, count);

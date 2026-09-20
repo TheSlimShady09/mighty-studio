@@ -55,21 +55,29 @@ export default function Hero() {
   const innerRef = useRef(null);
   const cameraRef = useRef(null);
   const cameraHostRef = useRef(null);
+  const cameraApi = useRef(null);
+  const copyRef = useRef(null);
 
   // The camera is a point cloud; the pointer blows it apart and it settles back.
-  useParticleCamera(cameraRef, cameraHostRef);
+  useParticleCamera(cameraRef, cameraHostRef, cameraApi);
 
-  // As the hero leaves, the statement sinks back into the smoke rather than
-  // simply scrolling off the top.
+  // As the hero leaves, the statement sinks and blurs away while the camera
+  // comes apart and falls into the page. Only the words are faded here: the
+  // camera has an exit of its own, and dimming the whole block would hide it
+  // before a single particle had moved.
   useScrollProgress(
     heroRef,
     p => {
       const inner = innerRef.current;
       if (inner) {
         inner.style.transform = `translate3d(0, ${(p * -130).toFixed(2)}px, 0) scale(${(1 - p * 0.1).toFixed(4)})`;
-        inner.style.opacity = clamp(1 - p * 1.7, 0, 1).toFixed(3);
-        inner.style.filter = p > 0.02 ? `blur(${(p * 7).toFixed(2)}px)` : 'none';
       }
+      const copy = copyRef.current;
+      if (copy) {
+        copy.style.opacity = clamp(1 - p * 1.7, 0, 1).toFixed(3);
+        copy.style.filter = p > 0.02 ? `blur(${(p * 7).toFixed(2)}px)` : 'none';
+      }
+      cameraApi.current?.setProgress(p);
     },
     { range: 'leaving' }
   );
@@ -79,7 +87,7 @@ export default function Hero() {
       <p className="hero__side" aria-hidden="true">{t.hero.side}</p>
 
       <div className="hero__inner shell" ref={innerRef}>
-        <div className="hero__copy">
+        <div className="hero__copy" ref={copyRef}>
           <Statement
             lines={t.hero.phrase}
             scriptWord={t.hero.phraseScript}
