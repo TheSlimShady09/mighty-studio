@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { SHOWCASE } from '../lib/content';
-import { cx, prefersReducedMotion } from '../lib/env';
+import { cx, isCoarsePointer, prefersReducedMotion } from '../lib/env';
 import { useLang } from '../lib/i18n';
 import Reveal from './Reveal';
 
@@ -55,9 +55,12 @@ export default function Showcase() {
     return () => clearTimeout(timer);
   }, [index, next]);
 
+  // Touch only. On a mouse the deck is not a control at all: no listeners
+  // are attached, so a cursor crossing it cannot reach anything, and it
+  // simply keeps running.
   useEffect(() => {
     const stage = stageRef.current;
-    if (!stage) return undefined;
+    if (!stage || !isCoarsePointer()) return undefined;
 
     const down = e => {
       if (e.button !== undefined && e.button !== 0) return;

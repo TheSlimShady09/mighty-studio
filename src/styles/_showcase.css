@@ -69,10 +69,9 @@
   visibility:visible;
   transform:translate3d(calc(var(--o) * 100% + var(--dx,0px)),0,0);
   transition:transform 880ms var(--e-out-expo);
-  will-change:transform;
 }
 /* under the finger there is no easing: the artwork tracks the drag exactly */
-.showcase__frames.is-dragging .slide.is-near{transition:none;}
+.showcase__frames.is-dragging .slide.is-near{transition:none;will-change:transform;}
 /* except when the clock comes round mid-drag, which glides instead of cutting */
 .showcase__frames.is-dragging.is-stepping .slide.is-near{
   transition:transform 880ms var(--e-out-expo);
@@ -164,4 +163,16 @@
   .showcase__hint span::after{animation:none;transform:none;}
   .showcase__name{animation:none;}
   .showcase__tab.is-on .showcase__tabbar i{animation:none;transform:scaleX(1);}
+}
+
+
+/* --- with a mouse, the deck is not a control ------------------
+   No listener is attached for a fine pointer, so none of the drag
+   affordances should be offered either: no grab cursor, no hint to
+   swipe, no scale on press. It runs, and the pointer passes over it
+   without touching anything. */
+@media (hover:hover) and (pointer:fine){
+  .showcase__frames{cursor:default;touch-action:auto;}
+  .showcase__frames:active{cursor:default;transform:none;}
+  .showcase__hint{display:none;}
 }

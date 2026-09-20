@@ -321,12 +321,18 @@ export function useParticleCamera(canvasRef, hostRef, api) {
 
     function wake() {
       if (running || !animate || !buf32) return;
+      // the pointer only matters while the cloud is on screen, so the listener
+      // lives and dies with the loop rather than with the page
+      window.addEventListener('pointermove', onMove, { passive: true });
+      window.addEventListener('pointerleave', onLeave);
       Ticker.add(step);
       running = true;
     }
 
     function sleep() {
       if (!running) return;
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerleave', onLeave);
       Ticker.remove(step);
       running = false;
     }
@@ -377,9 +383,6 @@ export function useParticleCamera(canvasRef, hostRef, api) {
         build();
         window.addEventListener('resize', onResize, { passive: true });
         window.addEventListener('scroll', redraw, { passive: true });
-        if (!animate) return;
-        window.addEventListener('pointermove', onMove, { passive: true });
-        window.addEventListener('pointerleave', onLeave);
         if (progress < 1) wake();
       });
 
