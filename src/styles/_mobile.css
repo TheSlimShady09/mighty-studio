@@ -59,10 +59,6 @@
   .lang__btn:hover{color:var(--grey-8a);}
   .lang__btn.is-on{background:var(--accent);color:#000000;}
 
-  /* the marquee must not stop because a finger brushed past it */
-  .marquee__track:hover{animation-play-state:running;}
-  .marquee__item:hover{color:var(--grey-4a);}
-
   /* services */
   .svc__row:hover::before,.svc__row:focus-within::before{transform:scaleX(0);}
   .svc__row:hover .svc__name{transform:none;}
