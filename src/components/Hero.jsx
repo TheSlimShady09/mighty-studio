@@ -4,7 +4,6 @@ import { useScrollProgress } from '../hooks/useScrollProgress';
 import { useParticleCamera } from '../hooks/useParticleCamera';
 import { clamp, cx } from '../lib/env';
 import { useLang } from '../lib/i18n';
-import Logo from './Logo';
 
 /**
  * The statement is split into per-letter layers that fly in from depth, with
@@ -95,9 +94,6 @@ export default function Hero() {
             label={t.hero.phrase.join(' ')}
             lang={lang}
           />
-          <div className="hero__sign">
-            <Logo className="hero__logo" />
-          </div>
         </div>
 
         {/* an empty box: it only reserves the camera's place in the grid.
@@ -113,15 +109,6 @@ export default function Hero() {
         document.body
       )}
 
-      <div className="hero__strip" aria-hidden="true">
-        <span className="hero__since">{t.hero.since}</span>
-        <span className="hero__scale" />
-        <ul className="hero__disciplines">
-          {t.hero.disciplines.map(d => (
-            <li key={d}>{d}</li>
-          ))}
-        </ul>
-      </div>
     </section>
   );
 }

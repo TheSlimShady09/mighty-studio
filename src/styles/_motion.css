@@ -12,7 +12,6 @@
   .grain{animation:none;opacity:.035;}
   .marquee__track{animation:none;}
   .wordmark .ltr{opacity:1;transform:none;filter:none;}
-  .hero__sign{opacity:1;transform:none;}
   [data-reveal]{opacity:1;transform:none;filter:none;}
   .line > span{transform:none;}
   .cf-item{transition:none;}

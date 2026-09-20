@@ -7,7 +7,12 @@
   padding:clamp(1rem,2.1vw,1.55rem) var(--gutter);
   border-bottom:1px solid transparent;
   transition:background 600ms var(--e-out-expo),backdrop-filter 600ms,border-color 600ms,transform 600ms var(--e-out-expo);
-  transform:translate3d(0,0,0);
+  /* No transform at rest, deliberately. A transformed element becomes the
+     containing block for its position:fixed descendants, which trapped the
+     mobile menu panel inside the height of this bar: the links were laid out
+     in a 70px box and centred themselves off the top of the screen. The bar
+     is never hidden while the menu is open, so the hidden state below can
+     still use one. */
 }
 .nav.is-stuck{
   background:rgba(0,0,0,.55);

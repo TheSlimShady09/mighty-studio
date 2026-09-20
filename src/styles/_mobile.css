@@ -32,10 +32,6 @@
       calc(clamp(1rem,4vw,3rem) + env(safe-area-inset-left));
   }
   .footer{padding-bottom:calc(clamp(1.8rem,3vw,2.6rem) + env(safe-area-inset-bottom));}
-  .hero__strip{
-    padding-left:calc(clamp(2.6rem,6vw,5.2rem) + env(safe-area-inset-left));
-    padding-right:calc(clamp(2.6rem,6vw,5.2rem) + env(safe-area-inset-right));
-  }
 }
 
 /* --- 16.2 touch: hover is a lie -------------------------------
@@ -131,31 +127,11 @@
   .hero__camera{max-width:min(86vw,360px);}
   .wordmark .ltr{font-size:clamp(2.4rem,11.4vw,3.5rem);line-height:1.08;}
   .wordmark .ltr--script{font-size:clamp(2.8rem,13.2vw,4.1rem);}
-  .hero__sign{margin-top:1.1rem;}
-  .hero__logo{height:32px;}
-
-  /* The foot strip loses its ruler: at this width it is a few pixels of
-     hatching that reads as dirt rather than as a scale. The studio's name is
-     already in the nav, so what is worth keeping is the disciplines. */
-  .hero__strip{
-    bottom:1.5rem;justify-content:center;
-    gap:.9rem;padding-inline:1.25rem;
-  }
-  .hero__scale,
-  .hero__since{display:none;}
-  .hero__disciplines{gap:.9rem;flex-wrap:nowrap;}
-  .hero__disciplines li{font-size:.7rem;letter-spacing:.18em;}
-  /* the wider rule hides everything from the third on, and :nth-child beats a
-     bare element selector whatever the order, so the third is named back in */
-  .hero__disciplines li:nth-child(3){display:block;}
-  .hero__disciplines li:nth-child(n+4){display:none;}
-
   /* Sections were breathing at desktop width on a screen a third as wide,
      which left long runs of nothing between them. */
   :root{--section-y:clamp(4rem,9vh,6rem);}
 }
 @media (max-width:380px){
-  .hero__disciplines li:nth-child(n+3){display:none;}
   .hero__camera{max-width:80vw;}
 }
 /* landscape on a phone has no vertical room for a full-height hero */
@@ -166,7 +142,6 @@
     padding-block:5.5rem 4rem;gap:2rem;
   }
   .hero__camera{order:0;max-width:300px;margin-inline:0;}
-  .hero__strip{display:none;}
 }
 
 /* --- 16.4 the slideshow on a phone ----------------------------- */
