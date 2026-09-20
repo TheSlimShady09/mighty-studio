@@ -27,9 +27,15 @@
     #000000 0%,#000000 52%,rgba(0,0,0,.72) 74%,rgba(0,0,0,0) 100%);
   pointer-events:none;
 }
-.hero__camera canvas{
-  position:relative;
-  display:block;width:100%;height:100%;
+/* The cloud is painted on a canvas the size of the window, fixed to it and
+   portalled out of this section, so the points scatter across the whole page
+   instead of being trapped in the camera's box. Above the light panels (56)
+   so they stay visible as they fall, below the nav (60). */
+.particles{
+  position:fixed;inset:0;
+  width:100%;height:100%;
+  z-index:57;
+  pointer-events:none;
 }
 
 /* wordmark — letters emerge from depth, blur to focus */

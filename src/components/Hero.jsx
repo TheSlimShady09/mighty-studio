@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useScrollProgress } from '../hooks/useScrollProgress';
 import { useParticleCamera } from '../hooks/useParticleCamera';
 import { clamp, cx } from '../lib/env';
@@ -99,10 +100,18 @@ export default function Hero() {
           </div>
         </div>
 
-        <div className="hero__camera" ref={cameraHostRef} aria-hidden="true">
-          <canvas ref={cameraRef} />
-        </div>
+        {/* an empty box: it only reserves the camera's place in the grid.
+            The cloud itself is painted on the page-wide canvas below. */}
+        <div className="hero__camera" ref={cameraHostRef} aria-hidden="true" />
       </div>
+
+      {/* Portalled to <body>: inside the hero it would be cut off by the
+          section's own overflow, and pinned by the parallax transform on
+          .hero__inner, so the points could never leave the square. */}
+      {createPortal(
+        <canvas className="particles" ref={cameraRef} aria-hidden="true" />,
+        document.body
+      )}
 
       <div className="hero__strip" aria-hidden="true">
         <span className="hero__since">{t.hero.since}</span>
